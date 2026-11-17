@@ -17,6 +17,10 @@ README = product front door. Non-technical people read it to decide if caveman w
 
 ---
 
+## Fork customization (slave-caveman)
+
+This fork keeps every token rule and adds a Korean servant persona to the three voice skills: chat prose always 한국어, the user is always 주인님, `caveman`/`ultracave` use 합쇼체 and `megacave` uses 사극체 (~하옵니다) instead of 文言文. Persisted artifacts (code, comments, commits, docs) never carry the persona. Each voice skill has a "Full-output exceptions" section: detail/precision requests, generated code and actionable values are never compressed. Statusline badges read `[SLAVE]` / `[ULTRASLAVE]` / `[MEGASLAVE]`; mode ids stay `caveman` / `ultracave` / `megacave`. The persona line lives in each skill's thesis (so the per-turn reinforcement carries it) and in the two hardcoded fallback rulesets (`caveman-config.js`, `caveman-activate.js`), which must stay identical. Benchmark numbers in READMEs predate the persona.
+
 ## Project overview
 
 Caveman makes AI coding agents respond in compressed caveman-style prose while preserving technical substance, code, commands, and exact errors. Publish no reduction or quality-equivalence percentage without a committed reviewed benchmark. Ships as Claude Code plugin, Codex plugin, Gemini CLI extension, and agent rule files for Cursor, Windsurf, Cline, Copilot, and other profiles via `npx skills`.
@@ -118,7 +122,7 @@ caveman/
 
 | File | What it controls |
 |------|-----------------|
-| `skills/caveman/SKILL.md` | The caveman voice: rules, auto-clarity, persistence. Sibling skills `skills/ultracave/SKILL.md` (grammar stripped) and `skills/megacave/SKILL.md` (文言文) are self-contained and each map 1:1 to a stored mode. Edit these three for behavior changes. |
+| `skills/caveman/SKILL.md` | The caveman voice: rules, auto-clarity, persistence. Sibling skills `skills/ultracave/SKILL.md` (grammar stripped) and `skills/megacave/SKILL.md` (한국어 사극체) are self-contained and each map 1:1 to a stored mode. Edit these three for behavior changes. |
 | `src/rules/caveman-activate.md` | Always-on auto-activation rule body, consumed by `src/tools/caveman-init.js` (per-repo IDE rule files) and by the opencode `AGENTS.md` block. GENERATED: `skills/compile.mjs` derives it from `skills/caveman/SKILL.md` (thesis line + rule headlines) plus the fixed tail in `skills/activation-rule.mjs`, and rewrites the `RULE_BODY` fallback in `caveman-init.js` to match. Edit the skill or the tail, rerun `node packages/cli/scripts/compile-registries.mjs`; `tests/installer/rule-copies.test.mjs` fails on drift. |
 | `src/rules/caveman-openclaw-bootstrap.md` | Marker-fenced bootstrap snippet appended to `~/.openclaw/workspace/SOUL.md` by `installer/lib/openclaw.js`. Drives always-on caveman through the OpenClaw gateway. Must include the SENTINEL `Respond terse like smart caveman` and stay well under OpenClaw's 12K-per-bootstrap-file cap. |
 | `.codex/codex-sessionstart.js` | Repo-local Codex SessionStart hook. Resolves the configured default mode through `src/hooks/caveman-config.js` and emits the active skill's ruleset whole, replacing the hardcoded `full`-level echo `.codex/hooks.json` used to carry — so `CAVEMAN_DEFAULT_MODE`, a repo-local `.caveman.json` and a user-config `defaultMode: "off"` all take effect on Codex. Also the user-level always-on hook (#573): `installer/install.js --only codex` copies it (shipped via `package.json` `files`) into the owned payload `$CODEX_HOME/caveman/hooks/` beside `caveman-config.js` and `package.json`, with `caveman/skills/{caveman,ultracave,megacave}/SKILL.md`, and merges one SessionStart entry into `$CODEX_HOME/hooks.json`, identified by that script path so foreign and caveman-CLI `native-hook` entries are never touched. `--no-hooks`/`--minimal` skip it; uninstall unmerges before removing the payload. Codex asks the user to trust a new hook via `/hooks`; never pre-trust it. Carries a hand-copied `FALLBACK_VALID_MODES` for when the shared resolver is absent; `tests/hooks/codex-sessionstart.test.mjs` fails if it drifts from `VALID_MODES`. |
@@ -228,7 +232,7 @@ SessionStart hook ──┐                                        ┌── Use
                           mirrors       reads
                              ▼             ▼
               .caveman-active      caveman-statusline.sh ◀── session JSON on stdin
-           (last-write-wins,        [CAVEMAN] / [ULTRACAVE] / [MEGACAVE]
+           (last-write-wins,        [SLAVE] / [ULTRASLAVE] / [MEGASLAVE]  
             compat only)
 ```
 
@@ -291,16 +295,16 @@ Reads JSON from stdin — `session_id` scopes every read and write. Three respon
 - `/caveman-review` → `review`
 - `/caveman-compress` → `compress`
 
-**2. Natural-language activation/deactivation.** Matches phrases like "activate caveman", "turn on caveman mode", "talk like caveman" and writes the configured default mode. Matches "stop caveman", "disable caveman", "normal mode", "deactivate caveman" etc. and stores a durable `off` for the session. README promises these triggers, the hook enforces them.
+**2. Natural-language activation/deactivation.** Matches phrases like "activate caveman", "turn on caveman mode", "talk like caveman" and writes the configured default mode. Matches "stop caveman", "disable caveman", "normal mode", "deactivate caveman" etc. and stores a durable `off` for the session. Korean triggers (`KO_ON` / `KO_OFF` / `KO_BACK_TO_NORMAL`): "노예 모드 켜", "노예 모드 꺼", "평소 말투로 돌아가". They require the word `모드` and a clause-final verb, so negations ("켜지 마"), how-to questions and DB replication "slave" prose never fire; pinned in `tests/hooks/korean-triggers.test.mjs`. README promises these triggers, the hook enforces them.
 
 **3. Per-turn reinforcement.** When the session's mode is a non-independent one (i.e. not `commit`/`review`/`compress`), emits a small `hookSpecificOutput` JSON reminder so the model keeps caveman style after other plugins inject competing instructions mid-conversation. The full ruleset still comes from SessionStart — this is just an attention anchor. `reinforce: false` / `CAVEMAN_REINFORCE=0` (`getReinforce`) turns the reminder off; it never gates the ruleset a mid-session switch carries (#975).
 
 ### `src/hooks/caveman-statusline.sh` — Statusline badge
 
 Reads the session JSON Claude Code pipes to it on stdin, extracts `session_id` (pure bash — no `jq` dependency), and reads `.caveman-sessions/<id>.mode`; falls back to `$CLAUDE_CONFIG_DIR/.caveman-active` when there is no usable id. Outputs colored badge string for Claude Code statusline:
-- `caveman` or empty → `[CAVEMAN]` (orange)
+- `caveman` or empty → `[SLAVE]` (orange)
 - `off` → nothing at all. Never `[CAVEMAN:OFF]` — that reads as a mode rather than the absence of one
-- `ultracave` → `[ULTRACAVE]`, `megacave` → `[MEGACAVE]`; one-shots → `[CAVEMAN:<MODE_UPPERCASED>]` (orange). Legacy stored values render through the same map
+- `ultracave` → `[ULTRASLAVE]`, `megacave` → `[MEGASLAVE]`; one-shots → `[SLAVE:<MODE_UPPERCASED>]` (orange). Legacy stored values render through the same map
 
 Stdin is bounded the same way as the SessionStart hook: `[ ! -t 0 ]` skips an interactive terminal, and `read -r -d '' -t 1` caps the wait. The timeout is an **integer on purpose** — macOS ships bash 3.2, which rejects `-t 0.3` with `invalid timeout specification`.
 
@@ -336,7 +340,7 @@ Each skill has a human-facing `README.md` alongside the LLM-facing `SKILL.md`. T
 
 ### Three skills, one mode model
 
-Three self-contained skills, each 1:1 with a stored mode id: `caveman` (default voice), `ultracave` (grammar stripped), `megacave` (文言文). The SessionStart hook injects `skills/<id>/SKILL.md` whole; there is no per-level filtering. Legacy stored values map on read: `lite` and `full` → `caveman`, `ultra` → `ultracave`, every `wenyan*` → `megacave`. Writes emit new ids only. Mode persists until changed or session ends. Plan: `docs/technical/three-skills-refactor.md`.
+Three self-contained skills, each 1:1 with a stored mode id: `caveman` (default voice), `ultracave` (grammar stripped), `megacave` (한국어 사극체). The SessionStart hook injects `skills/<id>/SKILL.md` whole; there is no per-level filtering. Legacy stored values map on read: `lite` and `full` → `caveman`, `ultra` → `ultracave`, every `wenyan*` → `megacave`. Writes emit new ids only. Mode persists until changed or session ends. Plan: `docs/technical/three-skills-refactor.md`.
 
 `defaultMode: "manual"` is a Claude Code startup policy, not a fourth mode. It starts inactive, stores only `off`, and explicit bare-command or natural-language activation resolves to `caveman`. Keep it out of `VALID_MODES`; only configuration accepts it. OpenCode maps this policy to its existing caveman default because its installer also supplies static AGENTS.md activation. `/caveman status` is read-only and must return before one-shot restoration or any mode-state mutation.
 

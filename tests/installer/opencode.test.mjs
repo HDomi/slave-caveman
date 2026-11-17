@@ -768,7 +768,7 @@ test('opencode system.transform injects the active mode\'s SKILL.md body or thes
     const sysMega = { system: [] };
     await handlers['experimental.chat.system.transform']({}, sysMega);
     assert.match(sysMega.system[0], /CAVEMAN MODE ACTIVE \(megacave\)/);
-    assert.match(sysMega.system[0], /以文言答。技術之實皆存，唯贅言去之。/);
+    assert.match(sysMega.system[0], /한국어 사극체: a palace servant reporting to 주인님/);
   } finally {
     if (origDefault === undefined) delete process.env.CAVEMAN_DEFAULT_MODE;
     else process.env.CAVEMAN_DEFAULT_MODE = origDefault;

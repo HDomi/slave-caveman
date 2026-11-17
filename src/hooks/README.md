@@ -72,7 +72,7 @@ environment to opt a headless run back in.
 ### `caveman-statusline.sh` / `caveman-statusline.ps1` — Statusline badge script
 
 - Reads the session JSON Claude Code sends on stdin, takes `session_id`, and renders **that window's** mode; falls back to the legacy mirror when there is no usable id
-- Shows `[CAVEMAN]`, `[ULTRACAVE]`, `[MEGACAVE]`, `[CAVEMAN:COMMIT]`, etc. A deactivated session renders nothing at all — never `[CAVEMAN:OFF]`
+- Shows `[SLAVE]`, `[ULTRASLAVE]`, `[MEGASLAVE]`, `[SLAVE:COMMIT]`, etc. A deactivated session renders nothing at all — never `[CAVEMAN:OFF]`
 - Never blocks: an interactive terminal is not read from, and the stdin read has a 1s ceiling (integer, because macOS ships bash 3.2 and it rejects fractional `read -t`)
 - Shows mode only. The old `⛏` savings suffix is gone: `.caveman-statusline-suffix` is ignored, because a transcript cannot show what caveman saved
 
@@ -141,10 +141,10 @@ caveman_text=""
 if [ -f "$caveman_flag" ]; then
   caveman_mode=$(cat "$caveman_flag" 2>/dev/null)
   case "$caveman_mode" in
-    caveman|lite|full) caveman_badge="CAVEMAN" ;;
-    ultracave|ultra) caveman_badge="ULTRACAVE" ;;
-    megacave|wenyan*) caveman_badge="MEGACAVE" ;;
-    commit|review|compress) caveman_badge="CAVEMAN:$(echo "$caveman_mode" | tr '[:lower:]' '[:upper:]')" ;;
+    caveman|lite|full) caveman_badge="SLAVE" ;;
+    ultracave|ultra) caveman_badge="ULTRASLAVE" ;;
+    megacave|wenyan*) caveman_badge="MEGASLAVE" ;;
+    commit|review|compress) caveman_badge="SLAVE:$(echo "$caveman_mode" | tr '[:lower:]' '[:upper:]')" ;;
     *) caveman_badge="" ;;                # off or unknown — render nothing
   esac
   [ -n "$caveman_badge" ] && caveman_text=$'\033[38;5;172m['"${caveman_badge}"$']\033[0m'
@@ -157,11 +157,11 @@ whichever window wrote last and renders the new ids as `[CAVEMAN:CAVEMAN]` or
 never sees a literal `off` because the legacy mirror is deleted on deactivation.
 
 Badge examples:
-- `/caveman` → `[CAVEMAN]`
-- `/ultracave` → `[ULTRACAVE]`
-- `/megacave` → `[MEGACAVE]`
-- `/caveman-commit` → `[CAVEMAN:COMMIT]`
-- `/caveman-review` → `[CAVEMAN:REVIEW]`
+- `/caveman` → `[SLAVE]`
+- `/ultracave` → `[ULTRASLAVE]`
+- `/megacave` → `[MEGASLAVE]`
+- `/caveman-commit` → `[SLAVE:COMMIT]`
+- `/caveman-review` → `[SLAVE:REVIEW]`
 
 ## How It Works
 
@@ -174,7 +174,7 @@ SessionStart hook ──┐                                        ┌── Use
                           mirrors       reads
                              ▼             ▼
               .caveman-active      Statusline script  ◀── session JSON on stdin
-           (last-write-wins,        [CAVEMAN] / [ULTRACAVE] / [MEGACAVE]
+           (last-write-wins,        [SLAVE] / [ULTRASLAVE] / [MEGASLAVE]  
             compat only)
 
 SessionEnd hook ──(session_id, transcript_path)──▶ caveman-stats.js --record

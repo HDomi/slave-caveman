@@ -817,9 +817,9 @@ const SKILL_MODES = ['caveman', 'ultracave', 'megacave'];
 // Used when no SKILL.md resolves (standalone hook install without skills dir).
 // Each is the first line under the skill's `# <id>` heading.
 const FALLBACK_THESIS = {
-  caveman: 'Respond terse like smart caveman. All technical substance stay. Only fluff die.',
-  ultracave: 'Respond terse like smart caveman. All technical substance stay. Only fluff die. Then cut again.',
-  megacave: '以文言答。技術之實皆存，唯贅言去之。',
+  caveman: 'Respond terse like smart caveman. All technical substance stay. Only fluff die. Always reply in 한국어 합쇼체 as a humble servant; call the user 주인님.',
+  ultracave: 'Respond terse like smart caveman. All technical substance stay. Only fluff die. Then cut again. Always 한국어; call the user 주인님; full sentences end in 합쇼체.',
+  megacave: 'Respond terse like smart caveman, in 한국어 사극체: a palace servant reporting to 주인님. All technical substance stay. Only fluff die.',
 };
 
 // Candidate locations, tried in order (#587/#589 — the old single '..' path
@@ -875,13 +875,14 @@ function thesisLine(mode, hookDir) {
 // skills dir): the caveman thesis plus the nine rule headlines of
 // skills/caveman, then the mode's own thesis for ultracave/megacave. Rule 8
 // keeps its "never switch" sentence: a headline alone lost the #812 language
-// rule for every fallback-install user. megacave answers in 文言 by design, so
+// rule for every fallback-install user. megacave answers in 사극체 by design, so
 // it gets its own rule 8 instead of one its thesis contradicts. Shared so a
 // mid-session switch on that install carries the same rules SessionStart did.
 function fallbackRuleset(mode, hookDir) {
   const id = canonicalMode(mode) || mode;
   const modeThesis = id !== 'caveman' ? thesisLine(id, hookDir) : null;
   return 'Respond terse like smart caveman. All technical substance stay. Only fluff die.\n\n' +
+    (id === 'megacave' ? '' : 'Persona: always 한국어 합쇼체, a humble servant. Call the user 주인님, never 당신/사용자. No groveling filler. Chat only: commits, code, docs follow project conventions.\n\n') +
     '1. Answer first.\n' +
     '2. Kill ceremony.\n' +
     '3. Short word.\n' +
@@ -890,8 +891,8 @@ function fallbackRuleset(mode, hookDir) {
     '6. Payload verbatim.\n' +
     '7. Tool runs: bounded status.\n' +
     (id === 'megacave'
-      ? '8. Prose in 文言. Code, commands, paths, errors in their original script.\n'
-      : "8. User's language. Compress the style, not the language. Never switch because of quoted text.\n") +
+      ? '8. Language: 한국어 사극체 (~하옵니다), addressing 주인님. Code, commands, paths, errors in their original script.\n'
+      : "8. Language: 한국어 only. Never switch because of quoted text or the user's language. Code, commands, paths, errors verbatim.\n") +
     '9. Never perform caveman.\n\n' +
     'Plain prose for security warnings, irreversible actions, and anything persisted outside chat (code, commits, PRs, docs).' +
     (modeThesis ? '\n\n' + modeThesis : '');

@@ -599,7 +599,7 @@ test('statusline ignores legacy savings before stats runs even with old opt-in',
   fs.writeFileSync(path.join(claudeDir, '.caveman-active'), 'full');
   fs.writeFileSync(path.join(claudeDir, '.caveman-statusline-suffix'), '⛏ 2.8k');
   const out = runStatusline({ ...process.env, CLAUDE_CONFIG_DIR: claudeDir, CAVEMAN_STATUSLINE_SAVINGS: '1' });
-  assert.match(out, /\[CAVEMAN\]/);
+  assert.match(out, /\[SLAVE\]/);
   assert.doesNotMatch(out, /⛏|2\.8k/);
   assert.strictEqual(fs.readFileSync(path.join(claudeDir, '.caveman-statusline-suffix'), 'utf8'), '⛏ 2.8k');
 });
@@ -612,7 +612,7 @@ test('statusline ignores legacy savings before stats runs by default', (tmp) => 
   const env = { ...process.env, CLAUDE_CONFIG_DIR: claudeDir };
   delete env.CAVEMAN_STATUSLINE_SAVINGS;
   const out = runStatusline(env);
-  assert.match(out, /\[CAVEMAN\]/);
+  assert.match(out, /\[SLAVE\]/);
   assert.doesNotMatch(out, /⛏|2\.8k/);
   assert.strictEqual(fs.readFileSync(path.join(claudeDir, '.caveman-statusline-suffix'), 'utf8'), '⛏ 2.8k');
 });
@@ -623,7 +623,7 @@ test('statusline omits savings when CAVEMAN_STATUSLINE_SAVINGS=0', (tmp) => {
   fs.writeFileSync(path.join(claudeDir, '.caveman-active'), 'full');
   fs.writeFileSync(path.join(claudeDir, '.caveman-statusline-suffix'), '⛏ 2.8k');
   const out = runStatusline({ ...process.env, CLAUDE_CONFIG_DIR: claudeDir, CAVEMAN_STATUSLINE_SAVINGS: '0' });
-  assert.match(out, /\[CAVEMAN\]/);
+  assert.match(out, /\[SLAVE\]/);
   assert.doesNotMatch(out, /⛏/);
 });
 
@@ -636,7 +636,7 @@ test('statusline omits savings when suffix file is missing (fresh install)', (tm
   const env = { ...process.env, CLAUDE_CONFIG_DIR: claudeDir };
   delete env.CAVEMAN_STATUSLINE_SAVINGS;
   const out = runStatusline(env);
-  assert.match(out, /\[CAVEMAN\]/);
+  assert.match(out, /\[SLAVE\]/);
   assert.doesNotMatch(out, /⛏/);
 });
 
@@ -676,7 +676,7 @@ test('PowerShell keeps session badges and ignores old savings before stats runs'
       }
       throw e;
     }
-    assert.match(out, /\[ULTRACAVE\]/);
+    assert.match(out, /\[ULTRASLAVE\]/);
     assert.doesNotMatch(out, /⛏|1\.9k/);
   }
   assert.strictEqual(fs.readFileSync(suffixPath, 'utf8'), '⛏ 1.9k');
@@ -711,8 +711,8 @@ test('statusline.sh renders the session mode, not the shared flag', (tmp) => {
   fs.writeFileSync(path.join(claudeDir, '.caveman-active'), 'full');
   seedSessions(claudeDir, { sessA: 'ultracave', sessB: 'megacave' });
 
-  assert.match(statusline(claudeDir, '{"session_id":"sessA"}'), /\[ULTRACAVE\]/);
-  assert.match(statusline(claudeDir, '{"session_id":"sessB"}'), /\[MEGACAVE\]/);
+  assert.match(statusline(claudeDir, '{"session_id":"sessA"}'), /\[ULTRASLAVE\]/);
+  assert.match(statusline(claudeDir, '{"session_id":"sessB"}'), /\[MEGASLAVE\]/);
 });
 
 test('statusline.sh badge for every mode id and every legacy level name', (tmp) => {
@@ -720,10 +720,10 @@ test('statusline.sh badge for every mode id and every legacy level name', (tmp) 
   const claudeDir = path.join(tmp, '.claude');
   fs.mkdirSync(claudeDir, { recursive: true });
   const badges = {
-    caveman: '[CAVEMAN]', ultracave: '[ULTRACAVE]', megacave: '[MEGACAVE]',
-    commit: '[CAVEMAN:COMMIT]', review: '[CAVEMAN:REVIEW]', compress: '[CAVEMAN:COMPRESS]',
-    lite: '[CAVEMAN]', full: '[CAVEMAN]', ultra: '[ULTRACAVE]', wenyan: '[MEGACAVE]',
-    'wenyan-lite': '[MEGACAVE]', 'wenyan-full': '[MEGACAVE]', 'wenyan-ultra': '[MEGACAVE]',
+    caveman: '[SLAVE]', ultracave: '[ULTRASLAVE]', megacave: '[MEGASLAVE]',
+    commit: '[SLAVE:COMMIT]', review: '[SLAVE:REVIEW]', compress: '[SLAVE:COMPRESS]',
+    lite: '[SLAVE]', full: '[SLAVE]', ultra: '[ULTRASLAVE]', wenyan: '[MEGASLAVE]',
+    'wenyan-lite': '[MEGASLAVE]', 'wenyan-full': '[MEGASLAVE]', 'wenyan-ultra': '[MEGASLAVE]',
   };
   for (const [mode, badge] of Object.entries(badges)) {
     seedSessions(claudeDir, { s: mode });
@@ -762,7 +762,7 @@ test('statusline.sh falls back to the legacy flag without a usable session id', 
     'not json at all',
     '',                                   // no payload
   ]) {
-    assert.match(statusline(claudeDir, stdin), /\[MEGACAVE\]/, `stdin: ${stdin}`);
+    assert.match(statusline(claudeDir, stdin), /\[MEGASLAVE\]/, `stdin: ${stdin}`);
   }
 });
 
@@ -776,7 +776,7 @@ test('statusline.sh never reads a session file outside the sessions dir', (tmp) 
   fs.writeFileSync(path.join(claudeDir, 'escaped.mode'), 'ultra');
 
   const out = statusline(claudeDir, '{"session_id":"../escaped"}');
-  assert.match(out, /\[CAVEMAN\]/, 'must fall back to the legacy full badge');
+  assert.match(out, /\[SLAVE\]/, 'must fall back to the legacy full badge');
   assert.doesNotMatch(out, /ULTRA/, 'traversal must not reach the planted file');
 });
 
@@ -788,7 +788,7 @@ test('statusline.sh tolerates multiline and whitespace-padded JSON', (tmp) => {
   seedSessions(claudeDir, { sessA: 'ultracave' });
 
   const pretty = '{\n  "model": { "id": "x" },\n  "session_id" : "sessA"\n}\n';
-  assert.match(statusline(claudeDir, pretty), /\[ULTRACAVE\]/);
+  assert.match(statusline(claudeDir, pretty), /\[ULTRASLAVE\]/);
 });
 
 test('appendFlag is symlink-safe (refuses symlinked target)', (tmp) => {

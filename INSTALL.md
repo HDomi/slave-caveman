@@ -421,7 +421,7 @@ ls "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/.caveman-sessions/"
 A window where you said "stop caveman" stores `off` and stays off — including
 across the automatic context compaction that happens in long sessions.
 
-Statusline should show `[CAVEMAN]` (orange) at the bottom of Claude Code. `/caveman-stats` reports recorded usage; savings remain unknown without a measured comparison.
+Statusline should show `[SLAVE]` (orange) at the bottom of Claude Code. `/caveman-stats` reports recorded usage; savings remain unknown without a measured comparison.
 
 ## Update
 

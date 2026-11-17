@@ -27,7 +27,7 @@ const { writeSessionMode, loadRuleset, thesisLine } = require(path.join(REPO_ROO
 // a paraphrase of it.
 const ULTRA_ROW = 'Ultracave is caveman with the grammar stripped.';
 const FULL_ROW = 'Caveman is a voice, not broken grammar.';
-const MEGA_ROW = 'Megacave is caveman in Classical Chinese.';
+const MEGA_ROW = 'Megacave is caveman in historical-drama register.';
 
 let passed = 0;
 let failed = 0;
@@ -225,7 +225,7 @@ test('no reachable SKILL.md: reinforcement uses the built-in thesis fallback', (
   const ctx = runTrackerAgainstConfig({ stripNewExports: false, pluginRoot: nowhere });
   assert.ok(!ctx.includes(ULTRA_ROW), `no skill file, yet a body was injected:\n${ctx}`);
   assert.ok(ctx.includes('CAVEMAN MODE ACTIVE (ultracave). Respond terse like smart caveman. All technical'
-    + ' substance stay. Only fluff die. Then cut again. Answer only what was asked:'),
+    + ' substance stay. Only fluff die. Then cut again. Always 한국어; call the user 주인님; full sentences end in 합쇼체. Answer only what was asked:'),
     `fallback thesis missing:\n${ctx}`);
 });
 
@@ -238,7 +238,7 @@ test('no reachable SKILL.md: a switch injects the fallback ruleset', () => {
   assert.ok(ctx.includes('CAVEMAN MODE ACTIVE — mode: ultracave\n\nRespond terse like smart caveman.'),
     `fallback ruleset missing:\n${ctx}`);
   assert.ok(ctx.includes('9. Never perform caveman.'), `rule headlines missing:\n${ctx}`);
-  assert.ok(ctx.includes('Only fluff die. Then cut again.\n\nCAVEMAN MODE ACTIVE (ultracave).'),
+  assert.ok(ctx.includes('Only fluff die. Then cut again. Always 한국어; call the user 주인님; full sentences end in 합쇼체.\n\nCAVEMAN MODE ACTIVE (ultracave).'),
     `ultracave thesis missing, or the reminder no longer comes last:\n${ctx}`);
 });
 

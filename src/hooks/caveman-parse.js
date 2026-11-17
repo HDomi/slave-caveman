@@ -155,6 +155,29 @@ const ACTIVATION_TRIGGERS = [
   BREVITY_TRIGGER,
 ].map(re => new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g'));
 
+// Korean triggers (slave fork). JS `\b` is ASCII-only, so Hangul phrases use
+// explicit terminal lookaheads instead: the verb must end the clause, which
+// rejects negations ("켜지 마"), questions about the mode ("켜는 법") and
+// longer conjugations in one rule.
+const KO_MODE_NOUN = '(?:노예|슬레이브|slave|케이브맨|caveman|원시인)';
+const KO_END = '(?=$|[\\s.!?~,])';
+const KO_OFF = new RegExp(
+  KO_MODE_NOUN + '\\s*모드\\s*(?:를|을|는|은)?\\s*' +
+  '(?:꺼|끄기|off|종료|해제|그만|중지)(?:줘|라|해|해줘|하자|주세요|해주세요)?' + KO_END
+);
+const KO_BACK_TO_NORMAL = new RegExp(
+  '^(?:이제\\s*)?(?:평소|원래|일반|보통)\\s*(?:말투|모드)로\\s*' +
+  '(?:돌아가|돌아와|말해|대답해|바꿔|해)(?:줘|라|주세요)?' + KO_END
+);
+const KO_ON = new RegExp(
+  KO_MODE_NOUN + '\\s*모드\\s*(?:를|을)?\\s*' +
+  '(?:켜|on|시작|활성화)(?:줘|라|해|해줘|하자|주세요|해주세요)?' + KO_END
+);
+ACTIVATION_TRIGGERS.push(
+  new RegExp(KO_ON.source, 'g'),
+  new RegExp('^' + KO_MODE_NOUN + '\\s*모드\\s*[.!]*$', 'g'),
+);
+
 // True when any trigger matches outside a negated clause. Every match is
 // examined, not just the first: the first may be negated while a later,
 // independent one is not.
@@ -253,7 +276,9 @@ function parseModeChange(promptRaw, options) {
     // switch-back verb) or with caveman context — never mid-sentence for
     // e.g. vim's normal mode ("how do I exit vim normal mode").
     /^(please\s+)?(go\s+(back\s+)?(to\s+)?|back\s+to\s+|switch\s+(back\s+)?to\s+|return\s+to\s+)?normal\s+mode\b/.test(nlPrompt) ||
-    (/\bnormal\s+mode\b/.test(nlPrompt) && /\bcaveman\b/.test(nlPrompt))
+    (/\bnormal\s+mode\b/.test(nlPrompt) && /\bcaveman\b/.test(nlPrompt)) ||
+    KO_OFF.test(nlPrompt) ||
+    KO_BACK_TO_NORMAL.test(nlPrompt)
   );
   if (wantsOff) return { action: 'clear' };
 

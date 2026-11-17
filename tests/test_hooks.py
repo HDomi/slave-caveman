@@ -625,7 +625,7 @@ class SessionStartSourceTests(unittest.TestCase):
         self.set_session_mode("sessA", "wenyan-lite")
         r = self.activate({"session_id": "sessA", "source": "compact"})
         self.assertIn("CAVEMAN MODE ACTIVE — mode: megacave", r.stdout)
-        self.assertIn("Megacave is caveman in Classical Chinese.", r.stdout)
+        self.assertIn("Megacave is caveman in historical-drama register.", r.stdout)
         # Re-persisted under the new id; the mirror follows.
         self.assertEqual(self.session_mode("sessA"), "megacave")
         self.assertEqual((self.claude_dir / ".caveman-active").read_text(encoding="utf-8"), "megacave")
@@ -652,7 +652,7 @@ class SessionStartSourceTests(unittest.TestCase):
         self.assertIn("CAVEMAN MODE ACTIVE — mode: megacave", r.stdout)
         self.assertIn("Respond terse like smart caveman.", r.stdout)
         self.assertIn("9. Never perform caveman.", r.stdout)
-        self.assertIn("以文言答。技術之實皆存，唯贅言去之。", r.stdout)
+        self.assertIn("Respond terse like smart caveman, in 한국어 사극체: a palace servant reporting to 주인님. All technical substance stay. Only fluff die.", r.stdout)
         self.assertNotIn("### 1.", r.stdout)
 
     def test_resume_preserves_a_deactivated_session_too(self):

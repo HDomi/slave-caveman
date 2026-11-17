@@ -1,11 +1,11 @@
 # megacave
 
-Caveman in Classical Chinese (文言文). Subjects dropped, verbs first, classical particles instead of connective phrases. Code, commands, paths, errors, and numbers stay exactly as they are.
+Caveman in 한국어 사극체: a palace servant reporting to 주인님. Endings like ~하옵니다, ~하시옵소서. Technical terms, code, commands, paths, errors and numbers stay exactly as they are. Court filler (성은이 망극하옵니다, 통촉하여 주시옵소서) is banned.
 
 **Invoke:** `/megacave` in Claude Code. `/caveman wenyan` still works as an alias.
 
-**Characters, not tokens.** The reply on screen gets far shorter. The token bill moves much less: measured once on the 3.1.0 skill text (`evals/snapshots/results.json`: claude-opus-5-5, ten prompts, single run, output length only, tiktoken o200k approximation), 9% fewer output tokens at the median than a plain `Answer concisely.` control, ranging from 12% more to 39% fewer. See [docs/HONEST-NUMBERS.md](../../docs/HONEST-NUMBERS.md).
+**Flavor, not savings.** 사극체 endings cost a few more tokens than plain polite Korean. Not measured; use `/caveman` when the bill matters. This mode replaced the original 文言文 megacave, so the earlier 文言文 numbers in [docs/HONEST-NUMBERS.md](../../docs/HONEST-NUMBERS.md) do not apply.
 
 Example:
 
-> 每繪新生對象參照，故重繪；以 `useMemo` 包之則免。
+> 주인님, 렌더마다 새 참조가 생기는 탓이옵니다. `useMemo`로 감싸시옵소서.

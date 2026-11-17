@@ -7,7 +7,7 @@ Show the caveman quick-reference card.
 |---|---|
 | `/caveman` | Caveman voice, default |
 | `/ultracave` | Maximum compression |
-| `/megacave` | Classical Chinese (文言文) |
+| `/megacave` | 한국어 사극체 (~하옵니다) |
 | `/caveman off` | Deactivate |
 | `/caveman-commit` | Terse commit message |
 | `/caveman-review` | One-line review findings |

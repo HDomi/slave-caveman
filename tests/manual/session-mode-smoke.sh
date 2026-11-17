@@ -72,7 +72,7 @@ check "sess-B is ultracave"       "ultracave" "$(mode_of sess-B)"
 echo
 echo "5. The statusline badge shows each window its own mode"
 check "sess-A renders nothing"    ""                 "$(badge '{"session_id":"sess-A"}')"
-check "sess-B renders ultracave"  "[ULTRACAVE]"      "$(badge '{"session_id":"sess-B"}')"
+check "sess-B renders ultracave"  "[ULTRASLAVE]"      "$(badge '{"session_id":"sess-B"}')"
 
 echo
 echo "6. Per-turn reinforcement follows the session, not the machine"
@@ -108,7 +108,7 @@ echo "10. Upgrade path: an old install has only the legacy flag, holding an old 
 export CLAUDE_CONFIG_DIR="$SANDBOX/old"
 mkdir -p "$CLAUDE_CONFIG_DIR"
 printf 'wenyan-lite' > "$CLAUDE_CONFIG_DIR/.caveman-active"
-check "badge maps legacy flag"    "[MEGACAVE]" "$(badge '{"session_id":"sess-X"}')"
+check "badge maps legacy flag"    "[MEGASLAVE]" "$(badge '{"session_id":"sess-X"}')"
 case "$(prompt '{"session_id":"sess-X","prompt":"hi"}')" in
   *'(megacave)'*) check "reinforcement maps legacy flag" "yes" "yes" ;;
   *)              check "reinforcement maps legacy flag" "yes" "no"  ;;

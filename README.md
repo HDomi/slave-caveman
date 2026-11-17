@@ -271,6 +271,23 @@ Pre-release (v0.1.0-rc.5). Python only, no sandbox yet. Own repo, own stars: **[
   <img src="docs/assets/learn-report.png" alt="Caveman Learn report: a summary and savings cards on the left; the biggest places tokens go, with one fix opened, and a chart of how full sessions get on the right" width="900">
 </p>
 
+## This fork: slave-caveman
+
+Same rocks, new voice. Every mode here answers in Korean (한국어), polite, and calls you 주인님 ("master"). Token rules stay the same: no greeting, no filler, code exact.
+
+| Ask | Answer |
+|---|---|
+| "Why does my component re-render?" | 주인님, 인라인 객체 prop이 렌더마다 새 참조를 만듭니다. `useMemo`로 감싸시면 됩니다. |
+
+- **Need the full answer?** Say 자세히, 정확히 or 전체. That reply comes uncompressed.
+- **New code always comes whole.** No `...`, no "rest unchanged".
+- **Switch in Korean:** "노예 모드 켜" turns it on, "노예 모드 꺼" or "평소 말투로 돌아가" turns it off.
+- **Three voices:** `/caveman` polite (~습니다), `/ultracave` fragments, `/megacave` historical-drama Korean (~하옵니다).
+- **Statusline** shows `[SLAVE]`.
+- Commits, code, comments and docs stay normal. The persona lives in chat only.
+
+Token numbers elsewhere in this README come from the original English skills. The Korean persona is not measured yet.
+
 ## Commands
 
 In your terminal:
@@ -292,7 +309,7 @@ In your agent:
 
 | Command | What it does |
 |---|---|
-| `/caveman` · `/ultracave` · `/megacave` | The voice, the grunt, the 文言文. `/caveman status` shows the mode, `/caveman off` stops it |
+| `/caveman` · `/ultracave` · `/megacave` | The voice, the grunt, the 사극체. All in 한국어, you are 주인님. `/caveman status` shows the mode, `/caveman off` or "노예 모드 꺼" stops it |
 | `/caveman-commit` | One-line Conventional Commit |
 | `/caveman-review` | One finding per line: `L42: 🔴 null deref. Guard it.` |
 | `/caveman-compress <file>` | Shrinks memory files and backs up the original |
